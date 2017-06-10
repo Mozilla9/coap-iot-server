@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+  @project: coap-iot-server
+  @created: 05.06.17
+  @author: Serge Maslyakov
+  -->
+
+<mapper namespace="io.github.mozilla9.data.mappers.DeviceDataMapper">
+
+    <resultMap id="DeviceDataMap" type="io.github.mozilla9.entities.DeviceData">
+        <id column="ID" property="id"/>
+
+        <result column="DEVICE_ID" property="deviceId"/>
+        <result column="CREATE_TS" property="createTs"/>
+        <result column="UPDATE_TS" property="updateTs"/>
+        <result column="DELETE_TS" property="deleteTs"/>
+
+        <result column="DATESTAMP" property="datestamp"/>
+        <result column="ALARM_MASK" property="alarmMask"/>
+        <result column="RAW_DATA" property="rawData"/>
+
+        <association property="owner" javaType="io.github.mozilla9.entities.IotDevice" column="DEVICE_ID">
+            <id column="ID" property="id"/>
+            <result column="CREATE_TS" property="createTs"/>
+            <result column="UPDATE_TS" property="updateTs"/>
+        </association>
+    </resultMap>
+
+    <insert id="insert" flushCache="true" parameterType="io.github.mozilla9.entities.DeviceData">
+        insert into DEVICE_DATA
+        (
+            <if test="data.datestamp != null">
+                DATESTAMP,
+            </if>
+            <if test="data.alarmMask != null">
+                ALARM_MASK,
+            </if>
+            <if test="data.rawData != null">
+                RAW_DATA,
+            </if>
+            DEVICE_ID,
+            CREATE_TS
+        )
+        values
+        (
+            <if test="data.datestamp != null">
+                #{data.datestamp},
+            </if>
+            <if test="data.alarmMask != null">
+                #{data.alarmMask},
+            </if>
+            <if test="data.rawData != null">
+                #{data.rawData},
+            </if>
+            #{data.owner.id},
+            CURRENT_TIMESTAMP
+        )
+    </insert>
+
+    <select id="selectAll" resultMap="DeviceDataMap" parameterType="io.github.mozilla9.entities.IotDevice">
+        select * from DEVICE_DATA where DEVICE_ID = #{device.id}
+    </select>
+
+    <update id="update" flushCache="true" parameterType="io.github.mozilla9.entities.DeviceData">
+        update DEVICE_DATA
+        <set>
+            <if test="data.datestamp != null">
+                DATESTAMP = #{data.datestamp},
+            </if>
+            <if test="data.alarmMask != null">
+                ALARM_MASK = #{data.alarmMask},
+            </if>
+            <if test="data.rawData != null">
+                RAW_DATA = #{data.rawData},
+            </if>
+            UPDATE_TS = CURRENT_TIMESTAMP
+        </set>
+        where ID = #{data.id}
+    </update>
+
+    <delete id="delete" flushCache="true" parameterType="io.github.mozilla9.entities.DeviceData">
+        delete from DEVICE_DATA where ID = #{data.id}
+    </delete>
+
+</mapper>

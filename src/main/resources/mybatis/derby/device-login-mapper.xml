@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+  @project: coap-iot-server
+  @created: 05.06.17
+  @author: Serge Maslyakov
+  -->
+
+<mapper namespace="io.github.mozilla9.data.mappers.DeviceLoginMapper">
+
+    <resultMap id="DeviceLoginMap" type="io.github.mozilla9.entities.DeviceLogin">
+        <id column="ID" property="id"/>
+
+        <result column="DEVICE_ID" property="deviceId"/>
+        <result column="CREATE_TS" property="createTs"/>
+        <result column="UPDATE_TS" property="updateTs"/>
+        <result column="DELETE_TS" property="deleteTs"/>
+
+        <result column="CONFIG_TOKEN" property="configToken"/>
+        <result column="FIRMWARE_TOKEN" property="firmwareToken"/>
+        <result column="SIGNAL_QUALITY" property="signalQuality"/>
+        <result column="BATTERY_VOLTAGE" property="batteryVoltage"/>
+        <result column="BATTERY_VOLTAGE_MIN" property="batteryVoltageMin"/>
+        <result column="RAW_DATA" property="rawData"/>
+
+        <association property="owner" javaType="io.github.mozilla9.entities.IotDevice" column="DEVICE_ID">
+            <id column="ID" property="id"/>
+            <result column="CREATE_TS" property="createTs"/>
+            <result column="UPDATE_TS" property="updateTs"/>
+        </association>
+    </resultMap>
+
+    <insert id="insert" flushCache="true" parameterType="io.github.mozilla9.entities.DeviceLogin">
+        insert into DEVICE_LOGIN
+        (
+            <if test="login.configToken != null">
+                CONFIG_TOKEN,
+            </if>
+            <if test="login.firmwareToken != null">
+                FIRMWARE_TOKEN,
+            </if>
+            <if test="login.signalQuality != null">
+                SIGNAL_QUALITY,
+            </if>
+            <if test="login.batteryVoltage != null">
+                BATTERY_VOLTAGE,
+            </if>
+            <if test="login.batteryVoltageMin != null">
+                BATTERY_VOLTAGE_MIN,
+            </if>
+            <if test="login.rawData != null">
+                RAW_DATA,
+            </if>
+            DEVICE_ID,
+            CREATE_TS
+        )
+        values
+        (
+            <if test="login.configToken != null">
+                #{login.configToken},
+            </if>
+            <if test="login.firmwareToken != null">
+                #{login.firmwareToken},
+            </if>
+            <if test="login.signalQuality != null">
+                #{login.signalQuality},
+            </if>
+            <if test="login.batteryVoltage != null">
+                #{login.batteryVoltage},
+            </if>
+            <if test="login.batteryVoltageMin != null">
+                #{login.batteryVoltageMin},
+            </if>
+            <if test="login.rawData != null">
+                #{login.rawData},
+            </if>
+            #{login.owner.id},
+            CURRENT_TIMESTAMP
+        )
+    </insert>
+
+    <select id="selectAll" resultMap="DeviceLoginMap" parameterType="io.github.mozilla9.entities.IotDevice">
+        select * from DEVICE_LOGIN where DEVICE_ID = #{device.id}
+    </select>
+
+    <update id="update" flushCache="true" parameterType="io.github.mozilla9.entities.DeviceLogin">
+        update DEVICE_LOGIN
+        <set>
+            <if test="login.configToken != null">
+                CONFIG_TOKEN = #{login.configToken},
+            </if>
+            <if test="login.firmwareToken != null">
+                FIRMWARE_TOKEN = #{login.firmwareToken},
+            </if>
+            <if test="login.signalQuality != null">
+                SIGNAL_QUALITY = #{login.signalQuality},
+            </if>
+            <if test="login.batteryVoltage != null">
+                BATTERY_VOLTAGE = #{login.batteryVoltage},
+            </if>
+            <if test="login.batteryVoltageMin != null">
+                BATTERY_VOLTAGE_MIN = #{login.batteryVoltageMin},
+            </if>
+            <if test="login.rawData != null">
+                RAW_DATA = #{login.rawData},
+            </if>
+            UPDATE_TS = CURRENT_TIMESTAMP
+        </set>
+        where ID = #{login.id}
+    </update>
+
+    <delete id="delete" flushCache="true" parameterType="io.github.mozilla9.entities.DeviceLogin">
+        delete from DEVICE_LOGIN where ID = #{login.id}
+    </delete>
+
+</mapper>

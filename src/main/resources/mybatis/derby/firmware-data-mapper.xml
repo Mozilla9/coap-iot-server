@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+  @project: coap-iot-server
+  @created: 05.06.17
+  @author: Serge Maslyakov
+  -->
+
+<mapper namespace="io.github.mozilla9.data.mappers.FirmwareDataMapper">
+
+    <resultMap id="FirmwareDataMap" type="io.github.mozilla9.entities.FirmwareData">
+        <id column="ID" property="id"/>
+
+        <result column="DEVICE_ID" property="deviceId"/>
+        <result column="CREATE_TS" property="createTs"/>
+        <result column="UPDATE_TS" property="updateTs"/>
+        <result column="DELETE_TS" property="deleteTs"/>
+
+        <result column="TOKEN" property="token"/>
+        <result column="VERSION" property="version"/>
+        <result column="DESCRIPTION" property="description"/>
+        <result column="FILE_URL" property="fileUrl"/>
+    </resultMap>
+
+    <insert id="insert" flushCache="true" parameterType="io.github.mozilla9.entities.FirmwareData">
+        insert into FIRMWARE_DATA
+        (
+            <if test="fw.token != null">
+                TOKEN,
+            </if>
+            <if test="fw.version != null">
+                VERSION,
+            </if>
+            <if test="fw.description != null">
+                DESCRIPTION,
+            </if>
+            <if test="fw.modem != null">
+                MODEM,
+            </if>
+            <if test="fw.fileUrl != null">
+                FILE_URL,
+            </if>
+            CREATE_TS
+        )
+        values
+        (
+            <if test="fw.token != null">
+                #{fw.token},
+            </if>
+            <if test="fw.version != null">
+                #{fw.version},
+            </if>
+            <if test="fw.description != null">
+                #{fw.description},
+            </if>
+            <if test="fw.modem != null">
+                #{fw.modem},
+            </if>
+            <if test="fw.fileUrl != null">
+                #{fw.fileUrl},
+            </if>
+            CURRENT_TIMESTAMP
+        )
+    </insert>
+
+    <select id="select" resultMap="FirmwareDataMap" parameterType="int">
+        select * from FIRMWARE_DATA where ID = #{id}
+    </select>
+
+    <select id="selectByToken" resultMap="FirmwareDataMap" parameterType="int">
+        select * from FIRMWARE_DATA where TOKEN = #{token}
+    </select>
+
+    <update id="update" flushCache="true" parameterType="io.github.mozilla9.entities.FirmwareData">
+        update FIRMWARE_DATA
+        <set>
+            <if test="fw.token != null">
+                TOKEN = #{fw.token},
+            </if>
+            <if test="fw.version != null">
+                VERSION = #{fw.version},
+            </if>
+            <if test="fw.description != null">
+                DESCRIPTION = #{fw.description},
+            </if>
+            <if test="fw.modem != null">
+                MODEM = #{fw.modem},
+            </if>
+            <if test="fw.fileUrl != null">
+                FILE_URL = #{fw.fileUrl},
+            </if>
+            UPDATE_TS = CURRENT_TIMESTAMP
+        </set>
+        where ID = #{fw.id}
+    </update>
+
+    <delete id="delete" flushCache="true" parameterType="io.github.mozilla9.entities.FirmwareData">
+        delete from FIRMWARE_DATA where ID = #{fw.id}
+    </delete>
+</mapper>

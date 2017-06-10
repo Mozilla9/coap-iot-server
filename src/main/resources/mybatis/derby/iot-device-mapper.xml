@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+  @project: coap-iot-server
+  @created: 05.06.17
+  @author: Serge Maslyakov
+  -->
+
+<mapper namespace="io.github.mozilla9.data.mappers.IotDeviceMapper">
+
+    <resultMap id="IotDeviceMap" type="io.github.mozilla9.entities.IotDevice">
+        <id column="ID" property="id"/>
+        <result column="CREATE_TS" property="createTs"/>
+        <result column="UPDATE_TS" property="updateTs"/>
+        <result column="DELETE_TS" property="deleteTs"/>
+
+        <result column="ADDRESS" property="address"/>
+        <result column="LATITUDE" property="latitude"/>
+        <result column="LONGITUDE" property="longitude"/>
+
+        <association property="config" javaType="io.github.mozilla9.entities.DeviceConfig">
+            <result column="DC_ID" property="id"/>
+            <result column="DC_CREATE_TS" property="createTs"/>
+            <result column="DC_UPDATE_TS" property="updateTs"/>
+            <result column="DC_DELETE_TS" property="deleteTs"/>
+
+            <result column="DC_TOKEN" property="token"/>
+            <result column="FREQ_OF_SENDING_DATA" property="freqOfSendingData"/>
+            <result column="DURATION_OF_SESSION" property="durationOfSession"/>
+        </association>
+
+        <association property="firmware" javaType="io.github.mozilla9.entities.FirmwareData">
+            <result column="FW_ID" property="id"/>
+            <result column="FW_CREATE_TS" property="createTs"/>
+            <result column="FW_UPDATE_TS" property="updateTs"/>
+            <result column="FW_DELETE_TS" property="deleteTs"/>
+
+            <result column="FW_TOKEN" property="token"/>
+            <result column="FW_VERSION" property="version"/>
+            <result column="FW_DESCRIPTION" property="description"/>
+            <result column="FW_FILE_URL" property="fileUrl"/>
+        </association>
+
+        <collection property="data" ofType="io.github.mozilla9.entities.DeviceData">
+            <result column="DD_ID" property="id"/>
+
+            <result column="DD_CREATE_TS" property="createTs"/>
+            <result column="DD_UPDATE_TS" property="updateTs"/>
+            <result column="DD_DELETE_TS" property="deleteTs"/>
+
+            <result column="DD_DATESTAMP" property="datestamp"/>
+            <result column="ALARM_MASK" property="alarmMask"/>
+            <result column="DD_RAW_DATA" property="rawData"/>
+
+            <result column="DD_DEVICE_ID" property="deviceId"/>
+            <association property="owner" javaType="io.github.mozilla9.entities.IotDevice">
+                <id column="ID" property="id"/>
+                <result column="CREATE_TS" property="createTs"/>
+                <result column="UPDATE_TS" property="updateTs"/>
+                <result column="DELETE_TS" property="deleteTs"/>
+            </association>
+        </collection>
+    </resultMap>
+
+    <insert id="insert" flushCache="true" parameterType="io.github.mozilla9.entities.IotDevice">
+        insert into WATER_METER
+        (
+            <if test="device.address != null">
+                ADDRESS,
+            </if>
+            <if test="device.latitude != null">
+                LATITUDE,
+            </if>
+            <if test="device.longitude != null">
+                LONGITUDE,
+            </if>
+            <if test="device.config != null">
+                CONFIG_ID,
+            </if>
+            <if test="device.firmware != null">
+                FIRMWARE_ID,
+            </if>
+            CREATE_TS,
+            ID
+        )
+        values
+        (
+            <if test="device.address != null">
+                #{device.address},
+            </if>
+            <if test="device.latitude != null">
+                #{device.latitude},
+            </if>
+            <if test="device.longitude != null">
+                #{device.longitude},
+            </if>
+            <if test="device.config != null">
+                #{device.config.id},
+            </if>
+            <if test="device.firmware != null">
+                #{device.firmware.id},
+            </if>
+            CURRENT_TIMESTAMP,
+            #{device.id}
+        )
+    </insert>
+
+    <sql id="all_iot_fields">
+        IOT.ADDRESS,
+        IOT.LATITUDE,
+        IOT.LONGITUDE,
+        IOT.CONFIG_ID,
+        IOT.CREATE_TS,
+        IOT.UPDATE_TS,
+        IOT.DELETE_TS,
+        IOT.ID,
+    </sql>
+
+    <sql id="all_cfg_fields">
+        DC.CREATE_TS as DC_CREATE_TS,
+        DC.UPDATE_TS as DC_UPDATE_TS,
+        DC.DELETE_TS as DC_DELETE_TS,
+        DC.ID as DC_ID,
+        DC.TOKEN as DC_TOKEN,
+        DC.FREQ_OF_SENDING_DATA,
+        DC.DURATION_OF_SESSION,
+    </sql>
+
+    <sql id="all_fw_fields">
+        FW.CREATE_TS as FW_CREATE_TS,
+        FW.UPDATE_TS as FW_UPDATE_TS,
+        FW.DELETE_TS as FW_DELETE_TS,
+        FW.ID as FW_ID,
+        FW.TOKEN as FW_TOKEN,
+        FW.VERSION as FW_VERSION,
+        FW.DESCRIPTION as FW_DESCRIPTION,
+        FW.FILE_URL as FW_FILE_URL,
+    </sql>
+
+    <sql id="all_data_fields">
+        DD.CREATE_TS as DD_CREATE_TS,
+        DD.UPDATE_TS as DD_UPDATE_TS,
+        DD.DELETE_TS as DD_DELETE_TS,
+        DD.ID as DD_ID,
+        DD.DATESTAMP as DD_DATESTAMP,
+        DD.ALARM_MASK,
+        DD.RAW_DATA as DD_RAW_DATA,
+        DD.DEVICE_ID as DD_DEVICE_ID
+    </sql>
+
+    <select id="select" resultMap="IotDeviceMap" parameterType="int">
+        select
+        <include refid="all_iot_fields"/>
+        <include refid="all_cfg_fields"/>
+        <include refid="all_fw_fields"/>
+        <include refid="all_data_fields"/>
+        from IOT_DEVICE IOT
+        left join DEVICE_CONFIG DC ON IOT.CONFIG_ID = DC.ID
+        left join FIRMWARE_DATA FW ON IOT.FIRMWARE_ID = FW.ID
+        left join DEVICE_DATA DD ON DD.DEVICE_ID = IOT.ID
+        where IOT.ID = #{id}
+    </select>
+
+    <select id="selectAll" resultMap="IotDeviceMap">
+        select
+        <include refid="all_iot_fields"/>
+        <include refid="all_cfg_fields"/>
+        <include refid="all_fw_fields"/>
+        <include refid="all_data_fields"/>
+        from IOT_DEVICE IOT
+        left join DEVICE_CONFIG DC ON IOT.CONFIG_ID = DC.ID
+        left join FIRMWARE_DATA FW ON IOT.FIRMWARE_ID = FW.ID
+        left join DEVICE_DATA DD ON DD.DEVICE_ID = IOT.ID
+    </select>
+
+    <update id="update" flushCache="true" parameterType="io.github.mozilla9.entities.IotDevice">
+        update IOT_DEVICE
+        <set>
+            <if test="device.address != null">
+                ADDRESS = #{device.address},
+            </if>
+            <if test="device.latitude != null">
+                LATITUDE = #{device.latitude},
+            </if>
+            <if test="device.longitude != null">
+                LONGITUDE = #{device.longitude},
+            </if>
+            <if test="device.config != null">
+                CONFIG_ID = #{device.config.id},
+            </if>
+            <if test="device.firmware != null">
+                FIRMWARE_ID = #{device.firmware.id},
+            </if>
+            UPDATE_TS = CURRENT_TIMESTAMP
+        </set>
+        where ID = #{device.id}
+    </update>
+
+    <delete id="delete" flushCache="true" parameterType="io.github.mozilla9.entities.IotDevice">
+        delete from IOT_DEVICE where ID = #{device.id}
+    </delete>
+
+</mapper>

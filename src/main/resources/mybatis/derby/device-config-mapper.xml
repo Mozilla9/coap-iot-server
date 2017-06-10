@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+  @project: coap-wm-server
+  @created: 05.06.17
+  @author: Serge Maslyakov
+  -->
+
+<mapper namespace="io.github.mozilla9.data.mappers.DeviceConfigMapper">
+
+    <resultMap id="DeviceConfigMap" type="io.github.mozilla9.entities.DeviceConfig">
+        <id column="ID" property="id"/>
+
+        <result column="DEVICE_ID" property="deviceId"/>
+        <result column="CREATE_TS" property="createTs"/>
+        <result column="UPDATE_TS" property="updateTs"/>
+        <result column="DELETE_TS" property="deleteTs"/>
+
+        <result column="TOKEN" property="token"/>
+        <result column="FREQ_OF_SENDING_DATA" property="freqOfSendingData"/>
+        <result column="DURATION_OF_SESSION" property="durationOfSession"/>
+
+    </resultMap>
+
+    <insert id="insert" flushCache="true" parameterType="io.github.mozilla9.entities.DeviceConfig">
+        insert into DEVICE_CONFIG
+        (
+            <if test="config.token != null">
+                TOKEN,
+            </if>
+            <if test="config.freqOfSendingData != null">
+                FREQ_OF_SENDING_DATA,
+            </if>
+            <if test="config.durationOfSession != null">
+                DURATION_OF_SESSION,
+            </if>
+            CREATE_TS
+        )
+        values
+        (
+            <if test="config.token != null">
+                #{config.token},
+            </if>
+            <if test="config.freqOfSendingData != null">
+                #{config.freqOfSendingData},
+            </if>
+            <if test="config.durationOfSession != null">
+                #{config.durationOfSession},
+            </if>
+            CURRENT_TIMESTAMP
+        )
+    </insert>
+
+    <select id="select" resultMap="DeviceConfigMap" parameterType="int">
+        select * from DEVICE_CONFIG where ID = #{id}
+    </select>
+
+    <select id="selectByToken" resultMap="DeviceConfigMap" parameterType="int">
+        select * from DEVICE_CONFIG where TOKEN = #{token}
+    </select>
+
+    <update id="update" flushCache="true" parameterType="io.github.mozilla9.entities.DeviceConfig">
+        update DEVICE_CONFIG
+        <set>
+            UPDATE_TS = CURRENT_TIMESTAMP
+        </set>
+         where ID = #{config.id}
+    </update>
+
+    <delete id="delete" flushCache="true" parameterType="io.github.mozilla9.entities.DeviceConfig">
+        delete from DEVICE_CONFIG where ID = #{config.id}
+    </delete>
+</mapper>
