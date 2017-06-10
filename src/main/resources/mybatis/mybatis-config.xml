@@ -44,7 +44,7 @@
 
     </environments>
     <mappers>
-        <mapper resource="mybatis/derby/water-meter-mapper.xml"/>
+        <mapper resource="mybatis/derby/iot-device-mapper.xml"/>
         <mapper resource="mybatis/derby/device-config-mapper.xml"/>
         <mapper resource="mybatis/derby/device-data-mapper.xml"/>
         <mapper resource="mybatis/derby/device-login-mapper.xml"/>
