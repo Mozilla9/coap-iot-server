@@ -1,5 +1,10 @@
 # coap-iot-server
-Implementation of small CoAP server for collecting data from IoT devices
+
+This project is an example how you can implement a CoAP server for collecting data from IoT devices.
+Common tasks when working with iot devices are:
+  - receive a packet with some data, then parse and put it in the DB.
+  - configure the device
+  - update firmware on-the-air
 
 Used [californium](https://github.com/eclipse/californium)
 
