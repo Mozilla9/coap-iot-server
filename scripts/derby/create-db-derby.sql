@@ -5,7 +5,7 @@
 --
 
 
-
+--- TODO: don't forget about credentials
 connect 'jdbc:derby://localhost:1527/coap_iot_db;create=true' user 'root' password 'root';
 
 
